@@ -1,45 +1,69 @@
 # Auth0 POC — Login Pages (ACUL)
 
-Páginas de diseño para la POC de "Advanced Customizations for Universal Login" (ACUL) en Auth0.
+Bundle JS/CSS para la POC de "Advanced Customizations for Universal Login" (ACUL) en Auth0.
 
 > **Importante:** esta versión usa una marca de demostración neutral ("Portal Empresa Demo",
-> logo genérico y paleta azul). Para la versión final, reemplaza el logo SVG de la cabecera, los
-> textos y las variables `--slate2-*` de `css/styles.css` por los de la marca real.
+> logo genérico y paleta azul). Para la versión final, reemplaza el logo SVG de `src/layout.js`,
+> los textos y las variables `--slate2-*` de `src/styles.css` por los de la marca real.
+
+## Cómo funciona
+
+Con ACUL, **Auth0 sirve el HTML** de cada pantalla desde el dominio custom del tenant y carga
+nuestros assets mediante `head_tags`. Este repo genera esos assets:
+
+- `dist/acul.js` — un único bundle (IIFE) que lee `window.universal_login_context.screen.name` y
+  dibuja la pantalla correspondiente usando el SDK [`@auth0/auth0-acul-js`](https://www.npmjs.com/package/@auth0/auth0-acul-js).
+- `dist/acul.css` — estilos compartidos.
+
+Los nombres de archivo son fijos (sin hash), así que los `head_tags` registrados en Auth0 no
+cambian entre deploys. GitHub Pages actúa como CDN.
+
+| Pantalla original     | Prompt / screen de Auth0                              |
+|-----------------------|-------------------------------------------------------|
+| `login.html`          | `login` / `login`                                     |
+| `idp-selector.html`   | `login-id` / `login-id` (botones de conexiones + correo) |
+| `reset-password.html` | `reset-password` / `reset-password-request`, `reset-password-email`, `reset-password`, `reset-password-success` |
+| `error.html`          | `reset-password` / `reset-password-error`             |
 
 ## Estructura
 
 ```
-auth0-poc-login-pages/
-├── index.html            # landing con links a las 4 páginas, solo para navegar la POC
-├── login.html            # pantalla de login
-├── reset-password.html   # reset de contraseña / OTP
-├── idp-selector.html     # selección de proveedor de identidad
-├── error.html             # página de error
-└── css/
-    └── styles.css          # design tokens y layout compartido (colores, tipografía, grid de 2 columnas)
+├── src/
+│   ├── main.js              # entrada: mapa screen.name -> renderer
+│   ├── layout.js            # esqueleto común (header, columna de formulario, panel de branding)
+│   ├── dom.js               # helpers de DOM (sin innerHTML)
+│   ├── preview.js           # contexto simulado para previsualizar fuera de Auth0
+│   ├── styles.css
+│   └── screens/             # una función por pantalla de Auth0
+├── public/                  # index.html (landing) y preview.html, copiados tal cual a dist/
+├── vite.config.js
+└── .github/workflows/deploy.yml   # build + deploy de dist/ a GitHub Pages en cada push a main
 ```
 
-Cada página comparte el mismo esqueleto (`wrapper > main-header > main-container (2 columnas) >
-main-footer`): la columna izquierda tiene el formulario (`#api`), y la derecha
-muestra el panel de branding ("Tu aliado en la gestión de tu empresa").
+## Desarrollo
 
-El `<div id="api">` es el placeholder: ahí es donde, en el ACUL real, el SDK de Auth0 inyecta el
-formulario/widget de cada pantalla. Hoy solo tiene un texto de marcador de posición para poder
-previsualizar el diseño.
+```bash
+npm install
+npm run preview   # build + servidor local en http://localhost:4173/preview.html?screen=login
+```
 
-## Cómo publicarlo en GitHub Pages (gratis)
+Fuera de Auth0 no existe `universal_login_context`, así que `preview.js` crea uno de prueba según
+`?screen=<nombre>` y, en vez de enviar el formulario a Auth0, muestra el payload que enviaría el SDK.
 
-1. Crea un repo nuevo en GitHub (puede ser público, sin costo) y sube el contenido de esta carpeta.
-2. En el repo: `Settings > Pages > Source: Deploy from a branch` → rama `main`, carpeta `/ (root)`.
-3. En unos minutos tendrás la URL pública:
-   `https://<tu-usuario>.github.io/<repo>/login.html` (y así para cada pantalla).
-4. Esas URLs son las que configuras en Auth0 (ACUL) para cada pantalla una vez que tengas el
-   dominio custom activo en tu tenant de pruebas.
+## Configuración en Auth0 (pendiente)
 
-## Próximos pasos para integrar con Auth0 ACUL
+Requisitos: dominio custom verificado, New Universal Login y una aplicación First Party.
+Para cada pantalla de la tabla, activar `rendering_mode: "advanced"` con estos `head_tags`:
 
-- Reemplazar el contenido de `#api` por el markup/JS que genera el ACUL SDK para cada pantalla
-  (login, reset-password, idp-selector, error).
-- Configurar en Auth0 (Management API o Dashboard) la URL de cada página publicada en GitHub Pages
-  como el host de la pantalla correspondiente.
-- Validar CORS/SRI si Auth0 lo requiere para los assets (`css/styles.css`).
+```json
+{
+  "rendering_mode": "advanced",
+  "head_tags": [
+    { "tag": "script", "attributes": { "src": "https://stisoft.github.io/poc-auth0-pages/acul.js", "defer": true } },
+    { "tag": "link", "attributes": { "rel": "stylesheet", "href": "https://stisoft.github.io/poc-auth0-pages/acul.css" } }
+  ]
+}
+```
+
+Se aplica con la Management API (`PATCH /api/v2/prompts/{prompt}/screen/{screen}/rendering`) o
+con el Auth0 CLI (`auth0 ul customize`).
