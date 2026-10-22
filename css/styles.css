@@ -1,0 +1,171 @@
+/* Design tokens for the Auth0 ACUL login pages POC (neutral demo palette). */
+:root {
+  --white-color: #fff;
+  --gray-color-50: #dfe1fa;
+  --gray-color-500: #6a6a94;
+  --gray-color-700: #3b3959;
+  --gray-color-900: #12111f;
+
+  --green-color-600: #628735;
+  --green-color-40: #e5f3d3;
+
+  --slate2-color-700: #1d4ed8;
+  --slate2-color-600: #2563eb;
+  --slate2-color-500: #3b82f6;
+  --slate2-color-300: #93c5fd;
+
+  --background-color: var(--white-color);
+  --text-color: var(--gray-color-500);
+  --subtitle-text-color: var(--gray-color-700);
+  --title-color: var(--gray-color-900);
+  --primary-color: var(--slate2-color-600);
+
+  --error-color: #fb4185;
+  --error-background: #ffd6e5;
+  --success-color: var(--green-color-600);
+  --success-background: var(--green-color-40);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: "Gibson", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+/* BEGIN: Structure */
+.wrapper {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
+.main-header,
+.main-footer {
+  height: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.main-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--title-color);
+  font-weight: 700;
+}
+
+.main-header .logo img {
+  width: 3.75rem; /* 60px */
+  height: 3.75rem;
+  display: block;
+}
+
+.main-header .logo hr {
+  border: none;
+  border-left: 1px solid var(--gray-color-50);
+  height: 24px;
+  margin: 0;
+}
+
+.main-container {
+  display: flex;
+  gap: 4rem; /* 64px */
+  background-color: var(--background-color);
+  position: relative;
+  flex: 1;
+  align-items: center;
+}
+
+.main-container__left-section {
+  flex: 1;
+  max-width: 420px;
+}
+
+.main-container__form h2 {
+  color: var(--title-color);
+  font-size: 1.5rem;
+  margin: 0 0 24px;
+}
+
+/* Placeholder box where Auth0's ACUL widget / form fields render */
+#api {
+  min-height: 280px;
+  border: 1px dashed var(--gray-color-50);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-color-500);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 16px;
+}
+
+.first-time-access {
+  margin-top: 16px;
+  font-size: 0.875rem;
+}
+
+.first-time-access a {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.main-container__right-section {
+  flex: 1;
+  display: none;
+}
+
+.main-container__right-section__info-cards__card-title h3 {
+  color: var(--title-color);
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 32px;
+}
+
+.main-container__right-section__highlight {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.main-container__right-section__info-cards__card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.main-container__right-section__card-icon {
+  background-color: var(--gray-color-50);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Show the right (branding) panel on wider screens, same breakpoint used in the original pages */
+@media (min-width: 992px) {
+  .main-container__right-section {
+    display: block;
+  }
+}
+/* END: Structure */
